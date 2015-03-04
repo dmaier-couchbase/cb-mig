@@ -4,8 +4,8 @@ This project aims to provide tools which help you to migrate from relational dat
 
 ## Core Requirements
 
-* It should be possible to extract the schema data from the relational source DBS
- Database / Schema (Some RDBMS dont seperate data into databases but schemas.)
+* It should be possible to extract the schema  from the relational source DBS
+  * Database / Schema (Some RDBMS dont seperate data into databases but schemas.)
   * Tables
   * Column definitions
   * Primary Keys
