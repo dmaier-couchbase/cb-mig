@@ -1,5 +1,6 @@
+# Couchbase Migration Tooling
 
-This project aims to provide tools which help you to migrate from relational database systems to Couchbase. So this is the Couchbase Migration Tooling project.
+This project aims to provide tools which help you to migrate from relational database systems to Couchbase.
 
 ## Core Requirements
 
