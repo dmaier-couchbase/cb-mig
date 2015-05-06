@@ -16,11 +16,13 @@
 
 package com.couchbase.mig.core.model;
 
+import com.couchbase.mig.core.helper.StringHelper;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class describes a relational database
@@ -30,19 +32,20 @@ import java.util.List;
 public class Database {
     
     //Constants
-    public static final String SCHEMA_COL = "TABLE_SCHEM";
+    public static final String TABLE_SCHEM = "TABLE_SCHEM";
+    public static final String TABLE_CATALOG = "TABLE_CATALOG";
     
     
     /**
      * The name of the datbase
      */
-    private final String name;
+    private final String url;
   
     
     /**
      * The schemas
      */
-    private List<Schema> schemas;
+    private final Map<String, Schema> schemas = new HashMap<>();
 
  
     /**
@@ -54,58 +57,75 @@ public class Database {
     /**
      * The constructor which takes the name and connection as an argument
      * 
-     * @param name
      * @param con 
+     * @throws java.sql.SQLException 
      */
-    public Database(String name, Connection con) {
+    public Database(Connection con) throws SQLException {
         
         this.con = con;
-        this.name = name;
+        this.url = con.getMetaData().getURL();
+        
+        retSchemaMetaData();
     }
     
-   
-    public void retSchemas() throws SQLException
+    /**
+     * Retrive the schema information of this database
+     * 
+     * @throws SQLException 
+     */
+    private void retSchemaMetaData() throws SQLException
     {
-        DatabaseMetaData dbMetaData = con.getMetaData();
-        
-        ResultSet rs = dbMetaData.getSchemas();
+        //Get the schemas
+        DatabaseMetaData dbMeta = this.con.getMetaData();
+        ResultSet rs = dbMeta.getSchemas();
         
         while (rs.next())
         {
+            Schema s = new Schema(this);
             
-            String schemaName = rs.getString(SCHEMA_COL);
+            String sName = rs.getString(TABLE_SCHEM);
+            String sCat = rs.getString(TABLE_CATALOG);
             
-            //TODO: Create and add new schema to the list
+            s.setName(sName);
+            s.setCatalog(sCat);
+            
+            String key = sName;
+            
+            if (StringHelper.isDefined(sCat))
+            {
+               key = sCat + "." + sName;
+            }
+
+            this.schemas.put(key, s);
         }
         
-    }
+        rs.close();
+        
+        //If there is no schema then add a default one
+        if (this.schemas.isEmpty()) this.schemas.put("default", new Schema(this));
 
-    /**
-     * Get the connection
-     * 
-     * @return 
-     */
+    }
+    
+    //Getters and Setters
     public Connection getCon() {
         return con;
     }
 
-    /**
-     * Get the name of the source database
-     * 
-     * @return 
-     */
-    public String getName() {
-        return name;
+    public String getUrl() {
+        return url;
     }
 
-    
+
+    public Map<String, Schema> getSchemas() {
+        return schemas;
+    }
+
     @Override
     public String toString() {
         
-        //TODO converts the model into a string tree
-        return super.toString();
+        return this.url;
     }
-    
+        
     
     
 }

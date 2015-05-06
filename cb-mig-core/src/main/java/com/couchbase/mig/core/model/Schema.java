@@ -16,7 +16,13 @@
 
 package com.couchbase.mig.core.model;
 
-import java.util.List;
+import com.couchbase.mig.core.helper.StringHelper;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -26,10 +32,23 @@ import java.util.List;
  */
 public class Schema {
     
+    //Constants
+    public static final String TABLE_NAME = "TABLE_NAME";
+    public static final String TABLE_TYPE = "TABLE_TYPE";
+    public static final String REMARKS = "REMARKS";
+    public static final String TYPE_VIEW="VIEW";
+    public static final String TYPE_TABLE="TABLE";
+    public static final String TYPE_SYSTABLE="SYSTEM TABLE";
+    
+    /**
+     * The JDBC connection to the source databse
+     */
+    private final Connection con;
+    
     /**
      * The database of the schema
      */
-    private Database db;
+    private final Database db;
     
     /**
      * The name of the schema
@@ -45,26 +64,111 @@ public class Schema {
     /**
      * The associated tables
      */
-    private List<Table> table;
+    private final Map<String, Table> tables = new HashMap<>();
+    private final Map<String, Table> sysTables = new HashMap<>();
+    private final Map<String, Table> views = new HashMap<>();
 
     /**
      * The constructor of a schema
      * 
-     * @param name
      * @param db 
+     * @throws java.sql.SQLException 
      */
-    public Schema(String name, Database db) {
+    public Schema(Database db) throws SQLException {
  
         this.db = db;
-        this.name = name;
+        this.con = db.getCon();
         
-        //TODO: Get the schema operations
-        //-- retTables( ... )
- 
+        retTableMetaData();
+        
+    }
+
+    /**
+     * Retrieve the table meta data
+     */
+    private void retTableMetaData() throws SQLException
+    {
+        DatabaseMetaData dbMeta = con.getMetaData();
+        
+        ResultSet rs = dbMeta.getTables(this.catalog, this.name, "%", null);
+        
+        while (rs.next())
+        {
+            String tableName = rs.getString(TABLE_NAME);
+            
+            Table t = new Table(tableName, this);
+            
+            String type = rs.getString(TABLE_TYPE);
+            
+            
+            t.setRemarks(rs.getString(REMARKS));
+            t.setName(tableName);
+            t.setType(type);
+            
+            if (type.equals(TYPE_TABLE))
+            {
+                tables.put(tableName, t);
+            }
+            
+            if (type.equals(TYPE_SYSTABLE))
+            {
+                sysTables.put(tableName, t);
+            }
+            
+            if (type.equals(TYPE_VIEW))
+            {
+                views.put(tableName, t);
+            }
+            
+        }
+        
+        rs.close();
     }
     
     
+    //Getters and Setters
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCatalog(String catalog) {
+        this.catalog = catalog;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getCatalog() {
+        return catalog;
+    }    
+
+    public Database getDb() {
+        return db;
+    }
+    public Map<String, Table> getTables() {
+        return tables;
+    }
+
+    public Map<String, Table> getSysTables() {
+        return sysTables;
+    }
+
+    public Map<String, Table> getViews() {
+        return views;
+    }
+
+    @Override
+    public String toString() {
     
+        String fqn = "default";
+        
+        if(StringHelper.isDefined(name)) fqn = name;
+        
+        if (StringHelper.isDefined(catalog)) fqn = catalog + "." + fqn;
+        
+        return fqn;
+    }
     
     
 }
