@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.couchbase.mig.core.model;
+package com.couchbase.mig.core.jdbc.model;
 
 import java.util.ArrayList;
 import java.util.List;

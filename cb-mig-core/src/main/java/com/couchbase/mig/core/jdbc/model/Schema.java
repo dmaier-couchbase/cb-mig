@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.couchbase.mig.core.model;
+package com.couchbase.mig.core.jdbc.model;
 
 import com.couchbase.mig.core.helper.StringHelper;
 import java.sql.Connection;
