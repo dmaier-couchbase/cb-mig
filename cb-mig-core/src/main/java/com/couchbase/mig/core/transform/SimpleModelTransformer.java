@@ -16,10 +16,8 @@
 
 package com.couchbase.mig.core.transform;
 
-import com.couchbase.mig.core.model.document.bucket.CacheBucket;
 import com.couchbase.mig.core.model.document.Document;
 import com.couchbase.mig.core.model.document.bucket.IBucket;
-import com.couchbase.mig.core.model.document.bucket.LogBucket;
 import com.couchbase.mig.core.model.document.Value;
 import com.couchbase.mig.core.model.jdbc.Column;
 import com.couchbase.mig.core.model.jdbc.Database;
@@ -36,7 +34,7 @@ import java.util.logging.Logger;
  * 
  * @author David Maier <david.maier at couchbase.com>
  */
-public class SimpleModelTransformer<T extends IBucket> implements ITransfomer {
+public class SimpleModelTransformer implements ITransfomer {
 
     /**
      * The bucket which is used
@@ -44,7 +42,7 @@ public class SimpleModelTransformer<T extends IBucket> implements ITransfomer {
     private IBucket bucket;
     
     
-    public SimpleModelTransformer(T bucket)
+    public SimpleModelTransformer(IBucket bucket)
     {
         this.bucket = bucket;
     }
