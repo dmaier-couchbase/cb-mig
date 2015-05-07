@@ -15,6 +15,7 @@ package com.couchbase.mig.core.model.document;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.couchbase.mig.core.model.document.bucket.CacheBucket;
 import java.util.Map;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -52,7 +53,7 @@ public class OutputModelTest {
     @Test
     public void testCreateModel() throws Exception {
      
-        Bucket b = new Bucket("test");
+        CacheBucket b = new CacheBucket("test");
          
         Document doc = new Document();
         doc.getProps().put("uid", new Value("dmaier"));

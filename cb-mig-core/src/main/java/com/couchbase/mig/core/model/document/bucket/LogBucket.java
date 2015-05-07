@@ -14,31 +14,37 @@
  * limitations under the License.
  */
 
-package com.couchbase.mig.core.model.document;
+package com.couchbase.mig.core.model.document.bucket;
+
+import com.couchbase.mig.core.model.document.Document;
+import java.util.Map;
 
 /**
- * Describes a key
- * 
+ *
  * @author David Maier <david.maier at couchbase.com>
  */
-public class Key {
-    
-    private final String inner;
+public class LogBucket implements IBucket {
 
-    public Key(String value)  {
-        
-        inner = value;
-    }
-
-
-    public String get() {
-        return inner;
+    @Override
+    public Document get(String key) {
+        throw new UnsupportedOperationException("Log entries are write only.");
     }
 
     @Override
-    public String toString() {
-        
-        return inner;
+    public Map<String, Document> getAll() {
+        throw new UnsupportedOperationException("Log entries are write only.");
     }
-   
+
+    @Override
+    public String getName() {
+        
+        return "log";
+    }
+
+    @Override
+    public void set(String key, Document value) {
+        
+        System.out.println(key + " : " + value);
+    }
+    
 }

@@ -16,8 +16,10 @@
 
 package com.couchbase.mig.core.transform;
 
-import com.couchbase.mig.core.model.document.Bucket;
+import com.couchbase.mig.core.model.document.bucket.CacheBucket;
 import com.couchbase.mig.core.model.document.Document;
+import com.couchbase.mig.core.model.document.bucket.IBucket;
+import com.couchbase.mig.core.model.document.bucket.LogBucket;
 import com.couchbase.mig.core.model.document.Value;
 import com.couchbase.mig.core.model.jdbc.Column;
 import com.couchbase.mig.core.model.jdbc.Database;
@@ -34,18 +36,24 @@ import java.util.logging.Logger;
  * 
  * @author David Maier <david.maier at couchbase.com>
  */
-public class SimpleModelTransformer implements ITransfomer {
+public class SimpleModelTransformer<T extends IBucket> implements ITransfomer {
 
+    /**
+     * The bucket which is used
+     */
+    private IBucket bucket;
+    
+    
+    public SimpleModelTransformer(T bucket)
+    {
+        this.bucket = bucket;
+    }
     
     private static final Logger LOG = Logger.getLogger(SimpleModelTransformer.class.getName());
     
     @Override
-    public Bucket transform(Database db) throws SQLException
-    {
-
-        //TODO: Extract the db name from the URL
-        Bucket b = new Bucket("default");
-        
+    public IBucket transform(Database db) throws SQLException
+    {        
        
         Map<String, Schema> schemas = db.getSchemas();
         
@@ -108,16 +116,13 @@ public class SimpleModelTransformer implements ITransfomer {
                     }
                     
                     //TODO: Create the references to other documents
-                    
-                    //TODO: To much memory consuption if caching on the application side, use a Loader instead
-                    //b.set(key, doc);
-                    //LOG.info(doc.toString());
-                    System.out.println(key + " : " + doc.toString());
+                    bucket.set(key, doc);
+                   
                 }
             }
         }
         
-        return b;
+        return bucket;
     }
     
     

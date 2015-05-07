@@ -16,12 +16,14 @@ package com.couchbase.mig.core.transform;
  * limitations under the License.
  */
 
-import com.couchbase.mig.core.model.document.Bucket;
+
+
+import com.couchbase.mig.core.model.document.bucket.IBucket;
+import com.couchbase.mig.core.model.document.bucket.LogBucket;
 import com.couchbase.mig.core.model.jdbc.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Map;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -67,10 +69,10 @@ public class SimpleModelTransformerTest {
      
          Database db = new Database(con);
          
-         SimpleModelTransformer transformer = new SimpleModelTransformer();
+         SimpleModelTransformer transformer = new SimpleModelTransformer(new LogBucket());
          
          
-         Bucket b = transformer.transform(db);
+         IBucket b = transformer.transform(db);
      
          System.out.println("");
      }

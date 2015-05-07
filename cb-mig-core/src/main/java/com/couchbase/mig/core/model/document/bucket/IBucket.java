@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-package com.couchbase.mig.core.transform;
+package com.couchbase.mig.core.model.document.bucket;
 
-import com.couchbase.mig.core.model.document.bucket.IBucket;
-import com.couchbase.mig.core.model.jdbc.Database;
-import java.sql.SQLException;
+import com.couchbase.mig.core.model.document.Document;
+import java.util.Map;
 
 /**
  *
  * @author David Maier <david.maier at couchbase.com>
  */
-public interface ITransfomer {
+public interface IBucket {
 
-    IBucket transform(Database db) throws SQLException;
+    Document get(String key);
+
+    Map<String, Document> getAll();
+
+    String getName();
+
+    void set(String key, Document value);
     
 }

@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.couchbase.mig.core.model.document;
+package com.couchbase.mig.core.model.document.bucket;
 
+import com.couchbase.mig.core.model.document.Document;
+import com.couchbase.mig.core.model.document.bucket.IBucket;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +26,7 @@ import java.util.Map;
  * 
  * @author David Maier <david.maier at couchbase.com>
  */
-public class Bucket {
+public class CacheBucket implements IBucket {
     
     /**
      * The name of the bucket
@@ -41,27 +43,31 @@ public class Bucket {
      * The constructor
      * @param name
      */
-    public Bucket(String name) {
+    public CacheBucket(String name) {
         
         this.name = name;
     }
     
     
+    @Override
     public void set(String key, Document value)
     {
         this.inner.put(key, value);
     }
     
+    @Override
     public Document get(String key)
     {
         return this.inner.get(key);
     }
 
+    @Override
     public String getName() {
         return name;
     }
    
     
+    @Override
     public Map<String, Document> getAll()
     {
         return this.inner;
