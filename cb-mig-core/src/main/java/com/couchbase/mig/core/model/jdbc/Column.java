@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.couchbase.mig.core.jdbc.model;
+package com.couchbase.mig.core.model.jdbc;
 
 import java.sql.Connection;
 
@@ -58,7 +58,7 @@ public class Column {
     /**
      * The type of the column, expressed as integer constant
      */
-    private String type;
+    private int type;
     
     /**
      * The information if NULL values are allowed 
@@ -104,7 +104,7 @@ public class Column {
         return size;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
@@ -138,7 +138,7 @@ public class Column {
         this.size = size;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
     }
 
@@ -161,7 +161,7 @@ public class Column {
     @Override
     public String toString() {
        
-        return this.name + ":" + this.type + "(" + this.size + ")";
+        return this.name + ":" + TypeMap.getInstance().get(this.type) + "(" + this.size + ")";
     }
     
 }

@@ -1,4 +1,4 @@
-package com.couchbase.mig.core.jdbc.model;
+package com.couchbase.mig.core.model.jdbc;
 
 /*
  * Copyright 2015 Couchbase, Inc.
@@ -16,12 +16,6 @@ package com.couchbase.mig.core.jdbc.model;
  * limitations under the License.
  */
 
-import com.couchbase.mig.core.jdbc.model.Table;
-import com.couchbase.mig.core.jdbc.model.PrimaryKey;
-import com.couchbase.mig.core.jdbc.model.Column;
-import com.couchbase.mig.core.jdbc.model.Schema;
-import com.couchbase.mig.core.jdbc.model.Database;
-import com.couchbase.mig.core.jdbc.model.ForeignKey;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;

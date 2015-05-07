@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.couchbase.mig.core.jdbc.model;
+package com.couchbase.mig.core.model.jdbc;
 
 import com.couchbase.mig.core.helper.StringHelper;
 import java.sql.Connection;
@@ -128,7 +128,7 @@ public class Table {
             c.setName(colName);
             c.setColDefault(rs.getString(COLUMN_DEF));
             c.setSize(rs.getInt(COLUMN_SIZE));
-            c.setType(TypeMap.getInstance().get(rs.getInt(DATA_TYPE)));
+            c.setType(rs.getInt(DATA_TYPE));
             c.setNullable(rs.getString(IS_NULLABLE));
             c.setPos(rs.getInt(ORDINAL_POSITION));
             c.setRemarks(rs.getString(REMARKS));
@@ -154,8 +154,13 @@ public class Table {
         while (rs.next())
         {
             Column c = new Column(this);
-            c.setName(rs.getString(COLUMN_NAME));
+            
+            String pkName = rs.getString(COLUMN_NAME);
+            c.setName(pkName);
             c.setPos(rs.getInt(KEY_SEQ));
+            
+            //Get the type of the column
+            c.setType(this.cols.get(pkName).getType());
             
             this.pk.addKey(c);
         }

@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.couchbase.mig.core.jdbc.model;
+package com.couchbase.mig.core.model.jdbc;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -63,6 +64,20 @@ public class PrimaryKey  {
      */
     public List<Column> getKeys()
     {
+        this.cols.sort(new Comparator<Column>() {
+
+            @Override
+            public int compare(Column o1, Column o2) {
+                
+                if (o1.getPos() < o2.getPos()) return -1;
+                if (o1.getPos() > o2.getPos()) return 1;
+                
+                //By default equal
+                return 0;
+            }
+        });
+        
+        
         return this.cols;
     }
 
