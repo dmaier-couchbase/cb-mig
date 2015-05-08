@@ -193,17 +193,7 @@ public class Table {
             fk.setRefTableName(rs.getString(PKTABLE_NAME));
             fk.setRefColumnName(rs.getString(PKCOLUMN_NAME));
             
-            String key = fk.getRefTableName() + "." + fk.getRefColumnName();
-            
-            if (StringHelper.isDefined(fk.getRefTableSchema()))
-            {
-                key = fk.getRefTableSchema() + "." + key;
-            }
-            
-            if (StringHelper.isDefined(fk.getRefTableCatalog()))
-            {
-                key = fk.getRefTableCatalog() + "." + key;
-            }
+            String key = StringHelper.createFqn(fk.getRefTableSchema(), fk.getRefTableName(), fk.getRefColumnName());
             
             fks.put(key, fk);
         }

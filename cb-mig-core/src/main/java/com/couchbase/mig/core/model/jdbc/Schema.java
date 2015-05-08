@@ -161,11 +161,10 @@ public class Schema {
     @Override
     public String toString() {
     
-        String fqn = "default";
         
-        if(StringHelper.isDefined(name)) fqn = name;
+        String fqn = StringHelper.createFqn(catalog, name);
         
-        if (StringHelper.isDefined(catalog)) fqn = catalog + "." + fqn;
+        if (!StringHelper.isDefined(fqn)) fqn = "default";
         
         return fqn;
     }

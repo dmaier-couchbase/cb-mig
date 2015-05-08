@@ -16,11 +16,15 @@
 
 package com.couchbase.mig.core.transform;
 
+import com.couchbase.mig.core.helper.StringHelper;
+import com.couchbase.mig.core.model.document.Array;
 import com.couchbase.mig.core.model.document.Document;
 import com.couchbase.mig.core.model.document.bucket.IBucket;
 import com.couchbase.mig.core.model.document.Value;
 import com.couchbase.mig.core.model.jdbc.Column;
 import com.couchbase.mig.core.model.jdbc.Database;
+import com.couchbase.mig.core.model.jdbc.ForeignKey;
+import com.couchbase.mig.core.model.jdbc.PrimaryKey;
 import com.couchbase.mig.core.model.jdbc.Schema;
 import com.couchbase.mig.core.model.jdbc.Table;
 import java.sql.ResultSet;
@@ -67,12 +71,10 @@ public class SimpleModelTransformer implements ITransfomer {
                 
                 String keyPrefix = "";
                 
-                Table table = tableEntry.getValue();
-                
+                Table table = tableEntry.getValue(); 
                  
                 //Build the fully qualified name of the table
-                String fqn = table.getName();
-                if (schema.getName() != null) fqn = schema.getName() + "." + table.getName();
+                String fqn = StringHelper.createFqn(table.getSchema().getCatalog(), table.getSchema().getName(), table.getName());
                           
                 //Use the table name as part of the key
                 keyPrefix = keyPrefix + fqn + "::";
@@ -113,10 +115,62 @@ public class SimpleModelTransformer implements ITransfomer {
                         doc.getProps().put(colName, new Value(TypeConverter.convert(column.getType(), colVal)));
                     }
                     
-                    //TODO: Create the references to other documents
+                    
+                    Map<String, ForeignKey> fks = table.getFks();
+                    
+                    for (Map.Entry<String, ForeignKey> fkEntry : fks.entrySet()) {
+                       
+                        Array<String> fkArr = new Array<>();
+                        
+                        String fkKeyPrefix = fkEntry.getKey();
+                        ForeignKey fkValue = fkEntry.getValue();
+                        
+
+                        //SELECT * FROM fqn, fqnRefTable WHERE fkKey = fkValue.name
+                        
+                        Schema refSchema = db.getSchemas().get(StringHelper.createFqn(fkValue.getRefTableCatalog(), fkValue.getRefTableSchema()));              
+                        if (refSchema == null) refSchema = db.getSchemas().get("default");
+                        
+                        Table refTable = refSchema.getTables().get(fkValue.getRefTableName());
+                        String fqnRefTable = StringHelper.createFqn(refTable.getSchema().getCatalog(), refTable.getSchema().getName(), refTable.getName());
+                        String fkColName = StringHelper.createFqn(table.getSchema().getName(), table.getName(), fkValue.getName());
+                        
+                        String join = "SELECT * FROM " + fqn + ", " + fqnRefTable + " WHERE " + fkKeyPrefix + " = " + fkColName  + " AND " + fkColName + " = " + new Value(TypeConverter.convert(table.getCols().get(fkValue.getName()).getType(), rs.getObject(fkValue.getName())));
+                        
+                        ResultSet rs2 = db.getCon().createStatement().executeQuery(join);
+                        
+                        while (rs2.next())   
+                        {
+                            String fkKey = fkKeyPrefix + "::";
+                            
+                            List<Column> refPKs = refTable.getPk().getKeys();
+                        
+                            int j = 0;
+                     
+                            for (Column pk : refPKs) {
+                       
+                                if (j != 0) fkKey = fkKey + "::";
+                         
+                                fkKey = fkKey + TypeConverter.convert( pk.getType(), rs.getObject(pk.getName())).toString();
+                          
+                                j++;
+                            }
+                            
+                            Value ref = new Value(fkKey);
+                            
+                            if (!fkArr.contains(ref)) fkArr.add(ref);
+                         
+                        }
+                            
+                        doc.getArrays().put("ref_" + fkValue.getName(), fkArr);
+                                                
+                    }        
+                    
                     bucket.set(key, doc);
                    
                 }
+                
+                rs.close();
             }
         }
         

@@ -89,13 +89,8 @@ public class Database {
             s.setName(sName);
             s.setCatalog(sCat);
             
-            String key = sName;
+            String key = StringHelper.createFqn(sCat, sName);
             
-            if (StringHelper.isDefined(sCat))
-            {
-               key = sCat + "." + sName;
-            }
-
             this.schemas.put(key, s);
         }
         

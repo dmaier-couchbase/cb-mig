@@ -49,5 +49,15 @@ public class Array<T> {
         
         return inner.toString();
     }
+    
+    public boolean contains(Value<T> v)
+    {
+        for (Value<T> value : inner) {
+            
+            if (value.toString().equals(v.toString())) return true;
+        }
+        
+        return false;
+    }
   
 }

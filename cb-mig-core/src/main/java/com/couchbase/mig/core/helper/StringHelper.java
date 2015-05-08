@@ -33,4 +33,40 @@ public class StringHelper {
     {
        return str != null && ! "".equals(str);
     }
+    
+    /**
+     * Create a fully qualified name 
+     * 
+     * @param domain
+     * @param name
+     * @return 
+     */
+    public static String createFqn(String domain, String name)
+    {
+        String result = "";
+        
+        if (isDefined(domain)) result = result + domain + ".";
+        if (isDefined(name)) result = result + name;
+        
+        return result;
+    }
+    
+    /**
+     * Create a fully qualified name
+     * 
+     * @param domain
+     * @param subdomain
+     * @param name
+     * @return 
+     */
+    public static String createFqn(String domain, String subdomain, String name)
+    {
+        String result = "";
+        
+        if (isDefined(domain)) result = result + domain + ".";
+        if (isDefined(subdomain)) result = result + subdomain + ".";
+        if (isDefined(name)) result = result + name;
+        
+        return result;
+    }
 }
